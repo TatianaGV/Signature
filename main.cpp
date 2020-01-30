@@ -10,15 +10,16 @@ using namespace std;
 int main(int argc, char** argv)
 {
     try {
-        if (argc < 3 || argc > 5)
-            throw invalid_argument("Usage: input_file output_file [chunk_size]");
+        if (argc < 3 || argc > 4)
+            throw invalid_argument("Incorrect input");
 
-        string inputFileName(argv[1]);
-        string outputFileName(argv[2]);
+        boost::filesystem::path inputFileName, outputFileName;
+        inputFileName = argv[1];
+        outputFileName = argv[2];
 
         CheckPaths(inputFileName, outputFileName);
 
-        unsigned long chunkSize = 1024 * 1024;
+        unsigned long chunkSize = 1024 * 1024; //1 mb
         const unsigned long totalSize = boost::filesystem::file_size(argv[1]);
 
         if (argc == 4) {
@@ -39,7 +40,6 @@ int main(int argc, char** argv)
 
         boost::thread_group threadPool;
 
-        // add threads to the thread pool
         for (size_t i = 0; i < nThreads; ++i) {
             threadPool.create_thread(boost::bind(&boost::asio::io_service::run, &ioService));
         }
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         threadPool.join_all();
         ioService.stop();
 
-        writeResults(outputFileName, outputResult);
+        writeHashSum(outputFileName, outputResult);
     }
 
     catch (const invalid_argument& errArg) {

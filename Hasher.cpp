@@ -12,7 +12,7 @@
 using namespace std;
 namespace fs = boost::filesystem;
 
-void CheckPaths(const boost::filesystem::path &inFilePath, const boost::filesystem::path &outFilePath) {
+void CheckPaths(const fs::path &inFilePath, const fs::path &outFilePath) {
     if (!fs::exists(inFilePath))
         throw std::runtime_error("source file does not exist");
 
@@ -27,7 +27,7 @@ void CheckPaths(const boost::filesystem::path &inFilePath, const boost::filesyst
         throw std::runtime_error(outFilePath.string() + "is not a file");
 }
 
-void singleThreadHasherTask(string &inputFileName, size_t &threadNumber,
+void singleThreadHasherTask(const fs::path &inputFileName, size_t &threadNumber,
                             size_t &nThreads, unsigned long &chunkSize,
                             vector<unsigned short> &resultVector) {
 
@@ -57,14 +57,14 @@ void singleThreadHasherTask(string &inputFileName, size_t &threadNumber,
 }
 
 
-void writeResults(string &outputFileName, vector<std::vector<unsigned short>> &result) {
+void writeHashSum(const fs::path& outputFileName, vector<std::vector<unsigned short>>& crcSum) {
     std::ofstream outputFileHandler;
     outputFileHandler.exceptions(std::ofstream::failbit | std::ofstream::badbit);
     try {
         outputFileHandler.open(outputFileName.c_str());
-        for (const auto &v : result)
-            for (const auto &x : v)
-                outputFileHandler << std::hex << x << ' ';
+        for (const auto &elem : crcSum)
+            for (const auto &sum : elem)
+                outputFileHandler << std::hex << sum << ' ';
         outputFileHandler.close();
     }
 
